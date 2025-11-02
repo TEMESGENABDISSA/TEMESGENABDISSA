@@ -1,4 +1,4 @@
-<h2 align="left">Hi 👋I'M TEMESGEN   SOFTWARE ENGINER ||  FULL STACK WEBDEVELOPER ||  FREELANCER ||</h2>
+<h2 align="left">Hi 👋I'M TEMESGEN   SOFTWARE ENGINER ||  FULL STACK WEBDEVELOPER </h2>
 
 ###
 
