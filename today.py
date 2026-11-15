@@ -359,7 +359,7 @@ def find_and_replace(root, element_id, new_text):
         element.text = new_text
 
 
-def commit_counter(comment_size):
+def commit_counter():
     """
     Counts up my total commits using GraphQL API directly instead of cache
     """
