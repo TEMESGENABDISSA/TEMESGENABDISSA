@@ -1,9 +1,4 @@
-<a href="https://github.com/YOUR_USERNAME/YOUR_USERNAME">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_USERNAME/main/dark_mode.svg">
-    <img alt="Temesgen's GitHub Profile README" src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_USERNAME/main/light_mode.svg">
-  </picture>
-</a>
+<img src="https://raw.githubusercontent.com/TEMESGENABDISSA/TEMESGENABDISSA/main/dark_mode.svg" alt="Temesgen's GitHub Profile README">
 
 ###
 
@@ -74,5 +69,3 @@
     <img src="https://img.shields.io/static/v1?message=Telegram&logo=telegram&label=&color=2CA5E0&logoColor=white&labelColor=&style=for-the-badge" height="35" alt="telegram logo"  />
   </a>
 </div>
-
-<sub>Profile card based on [Andrew6rant's](https://github.com/Andrew6rant/Andrew6rant) profile README template.</sub>
