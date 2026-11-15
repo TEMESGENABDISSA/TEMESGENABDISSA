@@ -409,7 +409,8 @@ def loc_counter_rest():
                 stats = stats_request.json()
                 if isinstance(stats, list):
                     for contributor in stats:
-                        if contributor.get('author', {}).get('login') == USER_NAME:
+                        author = contributor.get('author')
+                        if author and author.get('login') == USER_NAME:
                             # Sum all weeks
                             for week in contributor['weeks']:
                                 total_additions += week['a']
