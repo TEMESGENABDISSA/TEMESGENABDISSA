@@ -381,15 +381,15 @@ def commit_counter():
 
 def loc_counter_rest():
     """
-    Uses REST API to count total lines of code from owned repos
+    Uses REST API to count total lines of code from all repos
     More efficient than GraphQL for this use case
     """
     query_count('loc_counter_rest')
     total_additions = 0
     total_deletions = 0
     
-    # Get all owned repos
-    repos_url = f'https://api.github.com/user/repos?type=owner&per_page=100'
+    # Get all repos (owned, collaborated, organization member)
+    repos_url = f'https://api.github.com/user/repos?per_page=100'
     page = 1
     
     while True:
@@ -402,19 +402,18 @@ def loc_counter_rest():
             break
         
         for repo in repos:
-            if not repo['fork']:  # Only count original repos, not forks
-                # Get commit stats for this repo
-                stats_url = f"https://api.github.com/repos/{repo['full_name']}/stats/contributors"
-                stats_request = requests.get(stats_url, headers=HEADERS)
-                if stats_request.status_code == 200:
-                    stats = stats_request.json()
-                    if isinstance(stats, list):
-                        for contributor in stats:
-                            if contributor.get('author', {}).get('login') == USER_NAME:
-                                # Sum all weeks
-                                for week in contributor['weeks']:
-                                    total_additions += week['a']
-                                    total_deletions += week['d']
+            # Get commit stats for this repo
+            stats_url = f"https://api.github.com/repos/{repo['full_name']}/stats/contributors"
+            stats_request = requests.get(stats_url, headers=HEADERS)
+            if stats_request.status_code == 200:
+                stats = stats_request.json()
+                if isinstance(stats, list):
+                    for contributor in stats:
+                        if contributor.get('author', {}).get('login') == USER_NAME:
+                            # Sum all weeks
+                            for week in contributor['weeks']:
+                                total_additions += week['a']
+                                total_deletions += week['d']
         
         page += 1
         # Rate limit check
