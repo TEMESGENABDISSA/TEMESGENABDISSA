@@ -12,7 +12,7 @@ import hashlib
 # Issues and pull requests permissions not needed at the moment, but may be used in the future
 HEADERS = {'authorization': 'token '+ os.environ['ACCESS_TOKEN']}
 USER_NAME = os.environ['USER_NAME'] # your GitHub username
-QUERY_COUNT = {'user_getter': 0, 'follower_getter': 0, 'graph_repos_stars': 0, 'recursive_loc': 0, 'graph_commits': 0, 'loc_query': 0, 'commit_counter': 0}
+QUERY_COUNT = {'user_getter': 0, 'follower_getter': 0, 'graph_repos_stars': 0, 'recursive_loc': 0, 'graph_commits': 0, 'loc_query': 0, 'commit_counter': 0, 'loc_counter_rest': 0}
 
 
 def daily_readme(birthday):
@@ -367,7 +367,7 @@ def commit_counter():
     query = '''
     query($login: String!){
         user(login: $login) {
-            contributionsCollection {
+            contributionsCollection(from: "2008-01-01T00:00:00Z") {
                 contributionCalendar {
                     totalContributions
                 }
@@ -377,6 +377,52 @@ def commit_counter():
     variables = {'login': USER_NAME}
     request = simple_request(commit_counter.__name__, query, variables)
     return int(request.json()['data']['user']['contributionsCollection']['contributionCalendar']['totalContributions'])
+
+
+def loc_counter_rest():
+    """
+    Uses REST API to count total lines of code from owned repos
+    More efficient than GraphQL for this use case
+    """
+    query_count('loc_counter_rest')
+    total_additions = 0
+    total_deletions = 0
+    
+    # Get all owned repos
+    repos_url = f'https://api.github.com/user/repos?type=owner&per_page=100'
+    page = 1
+    
+    while True:
+        request = requests.get(repos_url + f'&page={page}', headers=HEADERS)
+        if request.status_code != 200:
+            break
+        
+        repos = request.json()
+        if not repos:
+            break
+        
+        for repo in repos:
+            if not repo['fork']:  # Only count original repos, not forks
+                # Get commit stats for this repo
+                stats_url = f"https://api.github.com/repos/{repo['full_name']}/stats/contributors"
+                stats_request = requests.get(stats_url, headers=HEADERS)
+                if stats_request.status_code == 200:
+                    stats = stats_request.json()
+                    if isinstance(stats, list):
+                        for contributor in stats:
+                            if contributor.get('author', {}).get('login') == USER_NAME:
+                                # Sum all weeks
+                                for week in contributor['weeks']:
+                                    total_additions += week['a']
+                                    total_deletions += week['d']
+        
+        page += 1
+        # Rate limit check
+        if 'X-RateLimit-Remaining' in request.headers:
+            if int(request.headers['X-RateLimit-Remaining']) < 10:
+                break
+    
+    return [total_additions, total_deletions, total_additions - total_deletions]
 
 
 def user_getter(username):
@@ -454,17 +500,15 @@ if __name__ == '__main__':
     OWNER_ID, acc_date = user_data
     formatter('account data', user_time)
     age_data, age_time = None, 0  # no Uptime/age line on this card
-    # Skip LOC calculation due to API rate limiting - using placeholder values
-    total_loc = ['0', '0', '0', True]
-    loc_time = 0
-    print('   LOC (skipped):           0.0000 ms')
+    total_loc, loc_time = perf_counter(loc_counter_rest)
+    formatter('LOC (REST API)', loc_time)
     commit_data, commit_time = perf_counter(commit_counter)
     star_data, star_time = perf_counter(graph_repos_stars, 'stars', ['OWNER'])
     repo_data, repo_time = perf_counter(graph_repos_stars, 'repos', ['OWNER'])
     contrib_data, contrib_time = perf_counter(graph_repos_stars, 'repos', ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'])
     follower_data, follower_time = perf_counter(follower_getter, USER_NAME)
 
-    for index in range(len(total_loc)-1): total_loc[index] = '{:,}'.format(int(total_loc[index])) # format added, deleted, and total LOC
+    for index in range(len(total_loc)-1): total_loc[index] = '{:,}'.format(total_loc[index]) # format added, deleted, and total LOC
 
     svg_overwrite('dark_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
     svg_overwrite('light_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
