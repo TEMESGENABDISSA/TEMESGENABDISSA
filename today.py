@@ -359,36 +359,24 @@ def find_and_replace(root, element_id, new_text):
         element.text = new_text
 
 
-def commit_counter(comment_size):
+def commit_counter():
     """
-    Counts up my total commits, using the cache file created by cache_builder.
+    Counts up my total commits using GraphQL API for all-time accurate count
     """
-    total_commits = 0
-    filename = 'cache/'+hashlib.sha256(USER_NAME.encode('utf-8')).hexdigest()+'.txt' # Use the same filename as cache_builder
-    try:
-        with open(filename, 'r') as f:
-            data = f.readlines()
-        cache_comment = data[:comment_size] # save the comment block
-        data = data[comment_size:] # remove those lines
-        for line in data:
-            total_commits += int(line.split()[2])
-        return total_commits
-    except FileNotFoundError:
-        # If cache doesn't exist, use GraphQL API as fallback
-        query_count('commit_counter')
-        query = '''
-        query($login: String!){
-            user(login: $login) {
-                contributionsCollection {
-                    contributionCalendar {
-                        totalContributions
-                    }
+    query_count('commit_counter')
+    query = '''
+    query($login: String!){
+        user(login: $login) {
+            contributionsCollection {
+                contributionCalendar {
+                    totalContributions
                 }
             }
-        }'''
-        variables = {'login': USER_NAME}
-        request = simple_request(commit_counter.__name__, query, variables)
-        return int(request.json()['data']['user']['contributionsCollection']['contributionCalendar']['totalContributions'])
+        }
+    }'''
+    variables = {'login': USER_NAME}
+    request = simple_request(commit_counter.__name__, query, variables)
+    return int(request.json()['data']['user']['contributionsCollection']['contributionCalendar']['totalContributions'])
 
 
 def user_getter(username):
@@ -468,7 +456,7 @@ if __name__ == '__main__':
     age_data, age_time = None, 0  # no Uptime/age line on this card
     total_loc, loc_time = perf_counter(loc_query, ['OWNER'], 7)
     formatter('LOC (cached)', loc_time) if total_loc[-1] else formatter('LOC (no cache)', loc_time)
-    commit_data, commit_time = perf_counter(commit_counter, 7)
+    commit_data, commit_time = perf_counter(commit_counter)
     star_data, star_time = perf_counter(graph_repos_stars, 'stars', ['OWNER'])
     repo_data, repo_time = perf_counter(graph_repos_stars, 'repos', ['OWNER'])
     contrib_data, contrib_time = perf_counter(graph_repos_stars, 'repos', ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'])
