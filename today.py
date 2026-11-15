@@ -359,24 +359,36 @@ def find_and_replace(root, element_id, new_text):
         element.text = new_text
 
 
-def commit_counter():
+def commit_counter(comment_size):
     """
-    Counts up my total commits using GraphQL API directly instead of cache
+    Counts up my total commits, using the cache file created by cache_builder.
     """
-    query_count('commit_counter')
-    query = '''
-    query($login: String!){
-        user(login: $login) {
-            contributionsCollection {
-                contributionCalendar {
-                    totalContributions
+    total_commits = 0
+    filename = 'cache/'+hashlib.sha256(USER_NAME.encode('utf-8')).hexdigest()+'.txt' # Use the same filename as cache_builder
+    try:
+        with open(filename, 'r') as f:
+            data = f.readlines()
+        cache_comment = data[:comment_size] # save the comment block
+        data = data[comment_size:] # remove those lines
+        for line in data:
+            total_commits += int(line.split()[2])
+        return total_commits
+    except FileNotFoundError:
+        # If cache doesn't exist, use GraphQL API as fallback
+        query_count('commit_counter')
+        query = '''
+        query($login: String!){
+            user(login: $login) {
+                contributionsCollection {
+                    contributionCalendar {
+                        totalContributions
+                    }
                 }
             }
-        }
-    }'''
-    variables = {'login': USER_NAME}
-    request = simple_request(commit_counter.__name__, query, variables)
-    return int(request.json()['data']['user']['contributionsCollection']['contributionCalendar']['totalContributions'])
+        }'''
+        variables = {'login': USER_NAME}
+        request = simple_request(commit_counter.__name__, query, variables)
+        return int(request.json()['data']['user']['contributionsCollection']['contributionCalendar']['totalContributions'])
 
 
 def user_getter(username):
@@ -454,17 +466,15 @@ if __name__ == '__main__':
     OWNER_ID, acc_date = user_data
     formatter('account data', user_time)
     age_data, age_time = None, 0  # no Uptime/age line on this card
-    # Skip LOC calculation due to API rate limiting - using placeholder values
-    total_loc = ['0', '0', '0', True]
-    loc_time = 0
-    print('   LOC (skipped):           0.0000 ms')
-    commit_data, commit_time = perf_counter(commit_counter)
+    total_loc, loc_time = perf_counter(loc_query, ['OWNER'], 7)
+    formatter('LOC (cached)', loc_time) if total_loc[-1] else formatter('LOC (no cache)', loc_time)
+    commit_data, commit_time = perf_counter(commit_counter, 7)
     star_data, star_time = perf_counter(graph_repos_stars, 'stars', ['OWNER'])
     repo_data, repo_time = perf_counter(graph_repos_stars, 'repos', ['OWNER'])
     contrib_data, contrib_time = perf_counter(graph_repos_stars, 'repos', ['OWNER', 'COLLABORATOR', 'ORGANIZATION_MEMBER'])
     follower_data, follower_time = perf_counter(follower_getter, USER_NAME)
 
-    for index in range(len(total_loc)-1): total_loc[index] = '{:,}'.format(int(total_loc[index])) # format added, deleted, and total LOC
+    for index in range(len(total_loc)-1): total_loc[index] = '{:,}'.format(total_loc[index]) # format added, deleted, and total LOC
 
     svg_overwrite('dark_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
     svg_overwrite('light_mode.svg', age_data, commit_data, star_data, repo_data, contrib_data, follower_data, total_loc[:-1])
