@@ -1,7 +1,31 @@
-<img src="https://raw.githubusercontent.com/TEMESGENABDISSA/TEMESGENABDISSA/main/dark_mode.svg" alt="Temesgen's GitHub Profile README">
+<a href="https://github.com/YOUR_USERNAME/YOUR_USERNAME">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_USERNAME/main/dark_mode.svg">
+    <img alt="Temesgen's GitHub Profile README" src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_USERNAME/main/light_mode.svg">
+  </picture>
+</a>
 
 ###
 
+<div align="left">
+  <a href="mailto:temesgenabdissa2@gmail.com" target="_blank">
+    <img src="https://img.shields.io/static/v1?message=Gmail&logo=gmail&label=&color=D14836&logoColor=white&labelColor=&style=for-the-badge" height="35" alt="Email me" />
+  </a>
+  <a href="https://www.linkedin.com/in/temesgen-abdissa-06315a25a" target="_blank">
+    <img src="https://img.shields.io/static/v1?message=LinkedIn&logo=linkedin&label=&color=0077B5&logoColor=white&labelColor=&style=for-the-badge" height="35" alt="LinkedIn profile" />
+  </a>
+  <a href="https://t.me/EMAMU_T" target="_blank">
+    <img src="https://img.shields.io/static/v1?message=Telegram&logo=telegram&label=&color=2CA5E0&logoColor=white&labelColor=&style=for-the-badge" height="35" alt="Telegram" />
+  </a>
+  <a href="https://portfolio-temesgenabdissas-projects.vercel.app/" target="_blank">
+    <img src="https://img.shields.io/static/v1?message=Portfolio&logo=vercel&label=&color=000000&logoColor=white&labelColor=&style=for-the-badge" height="35" alt="Temesgen || Abdissa portfolio" />
+  </a>
+  <a href="https://github.com/YOUR_USERNAME" target="_blank">
+    <img src="https://img.shields.io/static/v1?message=GitHub&logo=github&label=&color=181717&logoColor=white&labelColor=&style=for-the-badge" height="35" alt="GitHub profile" />
+  </a>
+</div>
+
+###
 <div align="left">
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" height="30" alt="javascript logo"  />
   <img width="12" />
@@ -58,14 +82,6 @@
 
 ###
 
-<div align="left">
-  <a href="mailto:temesgenabdissa2@gmail.com" target="_blank">
-    <img src="https://img.shields.io/static/v1?message=Gmail&logo=gmail&label=&color=D14836&logoColor=white&labelColor=&style=for-the-badge" height="35" alt="gmail logo"  />
-  </a>
-  <a href="https://www.linkedin.com/in/temesgen-abdissa-06315a25a" target="_blank">
-    <img src="https://img.shields.io/static/v1?message=LinkedIn&logo=linkedin&label=&color=0077B5&logoColor=white&labelColor=&style=for-the-badge" height="35" alt="linkedin logo"  />
-  </a>
-  <a href="https://t.me/EMAMU_T" target="_blank">
-    <img src="https://img.shields.io/static/v1?message=Telegram&logo=telegram&label=&color=2CA5E0&logoColor=white&labelColor=&style=for-the-badge" height="35" alt="telegram logo"  />
-  </a>
-</div>
+
+
+<sub>Profile card based on [Andrew6rant's](https://github.com/Andrew6rant/Andrew6rant) profile README template.</sub>
