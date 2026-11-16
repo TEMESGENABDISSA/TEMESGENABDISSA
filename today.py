@@ -367,7 +367,7 @@ def commit_counter():
     query = '''
     query($login: String!){
         user(login: $login) {
-            contributionsCollection {
+            contributionsCollection(from: "2008-01-01T00:00:00Z") {
                 contributionCalendar {
                     totalContributions
                 }
