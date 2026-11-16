@@ -367,7 +367,7 @@ def commit_counter():
     query = '''
     query($login: String!){
         user(login: $login) {
-            contributionsCollection(from: "2008-01-01T00:00:00Z") {
+            contributionsCollection {
                 contributionCalendar {
                     totalContributions
                 }
@@ -376,7 +376,12 @@ def commit_counter():
     }'''
     variables = {'login': USER_NAME}
     request = simple_request(commit_counter.__name__, query, variables)
-    return int(request.json()['data']['user']['contributionsCollection']['contributionCalendar']['totalContributions'])
+    result = request.json()
+    # Check for errors in response
+    if 'errors' in result:
+        print(f"GraphQL Error: {result['errors']}")
+        return 0
+    return int(result['data']['user']['contributionsCollection']['contributionCalendar']['totalContributions'])
 
 
 def loc_counter_rest():
